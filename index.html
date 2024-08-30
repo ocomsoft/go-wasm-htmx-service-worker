@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>go-wasm-http-server hello with state demo</title>
+    <script>
+        navigator.serviceWorker.register('sw.js')
+
+        document.addEventListener('htmx:configRequest', (event) => {
+            if (event.detail.path === 'api/hello') {
+                const input = document.querySelector("#name");
+                event.detail.parameters = { name: input.value };
+            }
+        });
+
+        async function hello() {
+            const name = document.querySelector("#name").value
+            const res = await fetch('api/hello', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name })
+            })
+            const { message } = await res.json()
+            alert(message)
+        }
+    </script>
+    <script src="https://unpkg.com/htmx.org@2.0.2" integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ" crossorigin="anonymous"></script>
+</head>
+<body>
+    <label for="name">Name: </label>
+    <input id="name" name="name" value="World" hx-post="api/hello2" hx-trigger="input" hx-target="#htmx_target">
+    <button onclick="hello()">Hello</button>
+    <div id="htmx_target"></div>
+
+</body>
+</html>
