@@ -5,13 +5,6 @@
     <script>
         navigator.serviceWorker.register('sw.js')
 
-        document.addEventListener('htmx:configRequest', (event) => {
-            if (event.detail.path === 'api/hello') {
-                const input = document.querySelector("#name");
-                event.detail.parameters = { name: input.value };
-            }
-        });
-
         async function hello() {
             const name = document.querySelector("#name").value
             const res = await fetch('api/hello', {
@@ -29,9 +22,12 @@
 </head>
 <body>
     <label for="name">Name: </label>
-    <input id="name" name="name" value="World" hx-post="api/hello2" hx-trigger="input" hx-target="#htmx_target">
+    <input id="name" name="name" value="World" hx-post="api/hello2" hx-trigger="input" hx-target="#htmx_target" style="width:100%">
     <button onclick="hello()">Hello</button>
     <div id="htmx_target"></div>
 
+
+    <button hx-get="api/get_list" hx-trigger="click" hx-target="#htmx_list_target">Load Posts</button>
+    <div id="htmx_list_target"></div>
 </body>
 </html>

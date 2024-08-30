@@ -3,8 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"sync/atomic"
+	"wasm-http/data"
 	"wasm-http/templates"
 
 	wasmhttp "github.com/nlepage/go-wasm-http-server"
@@ -13,6 +15,28 @@ import (
 func main() {
 	var counter int32
 
+	http.HandleFunc("/get_list", func(w http.ResponseWriter, r *http.Request) {
+		resp, err := http.Get("https://jsonplaceholder.typicode.com/posts")
+		if err != nil {
+			http.Error(w, "Failed to fetch data", http.StatusInternalServerError)
+			return
+		}
+		defer resp.Body.Close()
+
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			http.Error(w, "Failed to read response body", http.StatusInternalServerError)
+			return
+		}
+
+		var posts []data.Post
+		if err := json.Unmarshal(body, &posts); err != nil {
+			http.Error(w, "Failed to unmarshal JSON", http.StatusInternalServerError)
+			return
+		}
+
+		templates.Posts(posts).Render(r.Context(), w)
+	})
 	http.HandleFunc("/hello2", func(res http.ResponseWriter, req *http.Request) {
 
 		if err := req.ParseForm(); err != nil {

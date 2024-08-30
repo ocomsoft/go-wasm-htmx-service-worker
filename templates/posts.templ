@@ -1,0 +1,16 @@
+package templates
+import "wasm-http/data"
+import "strconv"
+
+templ Posts(posts []data.Post) {
+    for _, post := range posts {
+        <ol>
+           @Post(post)
+        </ol>
+    }
+    <div> Total: { strconv.Itoa(len(posts)) }</div>
+}
+
+templ Post(post data.Post) {
+    <li><strong style="color:green;">{post.Title}</strong><br>{post.Body}</li>
+}
