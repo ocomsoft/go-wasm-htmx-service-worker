@@ -29,5 +29,14 @@
 
     <button hx-get="api/get_list" hx-trigger="click" hx-target="#htmx_list_target">Load Posts</button>
     <div id="htmx_list_target"></div>
+
+<form hx-post="api/calc" hx-target="#expr_result">
+    <input name="a" type="number" value="10" />
+    <input name="b" type="number" value="20" />
+    <input name="expr" type="text" value="a * b" />
+
+    <input type="submit"></input>
+</form>
+<div id="expr_result"></div>
 </body>
 </html>

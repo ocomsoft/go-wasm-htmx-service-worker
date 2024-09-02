@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/d5/tengo/v2"
 	"io"
 	"net/http"
 	"sync/atomic"
@@ -14,6 +15,29 @@ import (
 
 func main() {
 	var counter int32
+
+	http.HandleFunc("/calc", func(w http.ResponseWriter, req *http.Request) {
+		if err := req.ParseForm(); err != nil {
+			panic(err)
+		}
+
+		expr := req.FormValue("expr")
+		values := map[string]interface{}{}
+
+		for key, value := range req.Form {
+			if len(value) > 0 {
+				values[key] = value[0]
+			}
+		}
+
+		res, err := tengo.Eval(req.Context(), expr, values)
+		if err != nil {
+			panic(err)
+		}
+
+		resStr := fmt.Sprintf("%v", res)
+		templates.RenderExpr(expr, resStr).Render(req.Context(), w)
+	})
 
 	http.HandleFunc("/get_list", func(w http.ResponseWriter, r *http.Request) {
 		resp, err := http.Get("https://jsonplaceholder.typicode.com/posts")
